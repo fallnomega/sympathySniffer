@@ -1,13 +1,21 @@
+#panda is data analysis lib
 import pandas as pd
-
+import pandas_datareader as web
+#pyplot makes plots/charts/graphs
+import matplotlib.pyplot as plt
+#style makes graph look pretty
+from matplotlib import style
+import datetime as dt
 import yfinance as yf
+from mpl_finance import candlestick_ohlc
+import matplotlib.dates as mdates
 import bs4 as bs
 import pickle
 import requests
 import os
 import csv
+from os import chdir
 import glob
-import pandas as pdlib
 import operator
 import openpyxl
 
@@ -19,7 +27,7 @@ def compare_tickers(master_file):
 
     # list = pd.read_csv(master_file)
     # print(list.head())
-    stock_list = pdlib.read_csv(master_file, delimiter = ',',
+    stock_list = pd.read_csv(master_file, delimiter = ',',
                                 )
     # print(stock_list.head())
     pd.to_datetime(stock_list['Date'],format='%Y-%m-%d')
@@ -34,7 +42,7 @@ def get_test_ticker_data(ticker):
         if not os.path.exists('test/{}.csv'.format(ticker)):
             try:
                 print('Getting data for: ' + ticker)
-                df = yf.download(ticker, period='3y', interval='1d')
+                df = yf.download(ticker, period='1y', interval='1d')
                 df.dropna(inplace=True)
                 df["Symbol"] = ticker
                 df["PercentIncrease_High_Open"] = df['High']*100 / df['Open'] -100
@@ -52,29 +60,15 @@ def get_test_ticker_data(ticker):
 def create_test_master_list(tickers,file_out):
     # Produce a single CSV after combining all files
 
-    result_obj = pdlib.concat([pdlib.read_csv('test/{}.csv'.format(ticker)) for ticker in tickers])
+    result_obj = pd.concat([pd.read_csv('test/{}.csv'.format(ticker)) for ticker in tickers])
     # Convert the above object into a csv file and export
     result_obj.to_csv(file_out, index=False, encoding="utf-8")
     print("\n\n-> Master file called %s  has been generated\n" % file_out)
 
-def save_sp500_tickers():
-    resp = requests.get('https://en.wikipedia.org/wiki/List_of_S%26P_500_companies')
-    soup = bs.BeautifulSoup(resp.text, "lxml")
-    table = soup.find('table', {'class': 'wikitable sortable'})
-    tickers = []
-    for row in table.findAll('tr')[1:]:
-        ticker = row.findAll('td')[0].text
-        ticker = ticker[:-1]
-        tickers.append(ticker + '\n')
-    # print(tickers)
-    with open('sp500tickers.pickle.text', 'wb') as f:
-        pickle.dump(tickers, f)
-    return tickers
 
 
 
 
-#
 def get_ticker_data(tickers,directory):
     for x in tickers:
         if not os.path.exists('sector'):
@@ -85,7 +79,7 @@ def get_ticker_data(tickers,directory):
         if not os.path.exists('sector/{}/{}.csv'.format(directory,x)):
             try:
                 print('Getting data for: ' + x)
-                df = yf.download(x , period='3y', interval='1d')
+                df = yf.download(x , period='2y', interval='1d')
                 df.dropna(inplace=True)
                 df["Symbol"] = x
                 df["PercentIncrease_High_Open"] = df['High']*100 / df['Open'] -100
@@ -101,12 +95,14 @@ def create_master_list(tickers,file_out,master_list_directory):
     print('Creating master file: {}'.format(file_out))
     # Produce a single CSV after combining all files
 
-    result_obj = pdlib.concat([pdlib.read_csv('sector/{}/{}.csv'.format(master_list_directory,ticker)) for ticker in tickers])
+    result_obj = pd.concat([pd.read_csv('sector/{}/{}.csv'.format(master_list_directory,ticker)) for ticker in tickers])
     # Convert the above object into a csv file and export
     result_obj.to_csv('sector/{}'.format(file_out), index=False, encoding="utf-8")
     print("\n\n-> Master file called %s  has been generated\n" % file_out)
 
 def purge_low_gain_volume(master_file):
+
+
     print ('Purging low volume and low gain entries')
     lines = list()
     lines.append(['Date','Open','High','Low','Close','Adj Close','Volume','Symbol','PercentIncrease_High_Open',
@@ -118,7 +114,7 @@ def purge_low_gain_volume(master_file):
             if row[8] =='':
                 continue
             else:
-                if float(row[8]) >= 10.0 and float(row[6]) >= 10000000:
+                if float(row[8]) >= 10.0 and float(row[6]) >= 3000000:
                     lines.append(row)
     print("-> Sorting the list by Date and Volume\n")
     sortedlist = sorted(lines, key=operator.itemgetter(0,6), reverse=True)
@@ -131,6 +127,7 @@ def purge_low_gain_volume(master_file):
     print("-> Removed anything below 10%% percent gain between Open and High from: %s\n" % master_file)
     print("-> Removed anything with volume below 10 million for that day from: %s\n" % master_file)
     return 0
+
 def get_industry_ticker_data(tickers,directory):
     for x in tickers:
         if not os.path.exists('industry'):
@@ -141,7 +138,7 @@ def get_industry_ticker_data(tickers,directory):
         if not os.path.exists('industry/{}/{}.csv'.format(directory,x)):
             try:
                 print('Getting data for: ' + x)
-                df = yf.download(x , period='3y', interval='1d')
+                df = yf.download(x , period='2y', interval='1d')
                 df.dropna(inplace=True)
                 df["Symbol"] = x
                 df["PercentIncrease_High_Open"] = df['High']*100 / df['Open'] -100
@@ -158,7 +155,7 @@ def create_industry_master_list(tickers,file_out,master_list_directory):
     print('Creating master file: {}'.format(file_out))
     # Produce a single CSV after combining all files
 
-    result_obj = pdlib.concat([pdlib.read_csv('industry/{}/{}.csv'.format(master_list_directory,ticker)) for ticker in tickers])
+    result_obj = pd.concat([pd.read_csv('industry/{}/{}.csv'.format(master_list_directory,ticker)) for ticker in tickers])
     # Convert the above object into a csv file and export
     result_obj.to_csv('industry/{}'.format(file_out), index=False, encoding="utf-8")
     print("\n\n-> Master file called %s  has been generated\n" % file_out)
@@ -180,7 +177,7 @@ def purge_industry_low_gain_volume(master_file):
     print("-> Sorting the list by Date and Volume\n")
     sortedlist = sorted(lines, key=operator.itemgetter(0,6), reverse=True)
 
-    with open('industry/{}'.format(master_file),'w') as writeFile:
+    with open('industry/{}_pruned'.format(master_file),'w') as writeFile:
         writer = csv.writer(writeFile)
         writer.writerows(sortedlist)
     # print ("Getting floats")
@@ -208,6 +205,7 @@ def combine_masters_into_one(directory,name):
 
     wb = openpyxl.load_workbook('{}'.format(name))
     worksheetnames = wb.sheetnames
+    print(worksheetnames)
     sheet_index = worksheetnames.index('main')
     wb.active=sheet_index
     for sheet in wb:
@@ -220,6 +218,58 @@ def combine_masters_into_one(directory,name):
 
 
     return 0
+
+def combine_one_list(directory,name):
+    print ("Creating an All in One file for the sectors")
+    all_files = glob.glob(os.path.join(directory, "*.csv"))
+    combined_csv = pd.concat([pd.read_csv(f) for f in all_files])
+    sortedList = sorted(combined_csv,key=operator.itemgetter(2),reverse=True)
+    combined_csv.to_csv("{}.csv".format(name), index=False, encoding='utf-8-sig')
+
+
+
+def highlight_dupe_dates ( area,name):
+    print ('Moving potential sympathy plays and the head of the snake rows in {} with same date'.format(area))
+    list = pd.read_csv('{}.csv'.format(name))
+    list2 = list.set_index('Date', drop=False)
+    duplicates = list[list.duplicated(["Date"])]
+    # print (duplicates.head())
+    duplicates.to_excel("{}_final_list.xlsx".format(area))
+    if os.path.exists("{}_aio_list.csv".format(area)):
+        os.remove("{}_aio_list.csv".format(area))
+    else:
+        print("The file does not exist")
+
+
+
+#blockchain
+blockchain_industry =['ACN', 'AMD', 'BITCF', 'BLOC', 'BTCS', 'BTL', 'BTL', 'BTSC', 'CODE', 'DCC', 'DGGXF', 'DPW', 'FTFT', 'GBTC', 'GCAP', 'GROW', 'HIVE', 'IBM', 'INTC', 'INTV', 'JPM', 'LFIN', 'MARA', 'MARK', 'MGTI', 'MSFT', 'NDAQ', 'NETE', 'NVDA', 'OMGT', 'OSTK', 'PFE', 'PRELF', 'QIWI', 'RIOT', 'SAP', 'SIEB', 'SING', 'SQ', 'SRAX', 'SSC', 'TSM', 'UBIA', 'UEPS', 'XBLK', 'XNET', 'ZNGA']
+blockchain_master_file = "blockchainmasterList.csv"
+blockchain_directory = 'blockchain'
+print("-> Running Sympathy Sniffer to get you your sympathy play candidates\n")
+get_ticker_data(blockchain_industry,blockchain_directory)
+create_master_list(blockchain_industry,blockchain_master_file,blockchain_directory)
+print("-> Master file created, filename: %s\n" % blockchain_master_file)
+purge_low_gain_volume(blockchain_master_file)
+print('-> And our Lord J Powell said... let there be no rest and lots of BRRRRRRR to your bottom line !')
+print('-> Process completed, enjoy the potential gains !')
+
+
+
+#cannabis
+cannabis_industry = ['ABBV', 'ACB', 'ARNA', 'BLOZF', 'CANN', 'CARA', 'CGC', 'CRBP', 'CRON',
+               'CVSI', 'DIGP', 'GRNH', 'GRWC', 'GWPH', 'IIPR', 'KAYS', 'KSHB', 'MCIG',
+               'MJNA', 'MO', 'MSRT', 'POTN', 'SMG', 'TGODF', 'TLRY', 'TRTC', 'TURV', 'YOLO',
+               'ZYNE']
+cannabis_master_file = "cannabismasterList.csv"
+cannabis_directory = 'cannabis'
+print("-> Running Sympathy Sniffer to get you your sympathy play candidates\n")
+get_ticker_data(cannabis_industry,cannabis_directory)
+create_master_list(cannabis_industry,cannabis_master_file,cannabis_directory)
+print("-> Master file created, filename: %s\n" % cannabis_master_file)
+purge_low_gain_volume(cannabis_master_file)
+print('\n\n-> And our Lord J Powell said... let there be no rest and lots of BRRRRRRR to your bottom line !')
+print('-> Process completed, enjoy the potential gains !')
 
 
 
@@ -426,39 +476,14 @@ print('-> Process completed, enjoy the potential gains !')
 
 
 combine_masters_into_one('sector','master_sector_file.xlsx')
+combine_one_list('sector','sector_aio_list')
+highlight_dupe_dates('sector','sector_aio_list')
 
 
 
 
 
 #industries
-#blockchain
-blockchain_industry =['ACN', 'AMD', 'BITCF', 'BLOC', 'BTCS', 'BTL', 'BTL', 'BTSC', 'CODE', 'DCC', 'DGGXF', 'DPW', 'FTFT', 'GBTC', 'GCAP', 'GROW', 'HIVE', 'IBM', 'INTC', 'INTV', 'JPM', 'LFIN', 'MARA', 'MARK', 'MGTI', 'MSFT', 'NDAQ', 'NETE', 'NVDA', 'OMGT', 'OSTK', 'PFE', 'PRELF', 'QIWI', 'RIOT', 'SAP', 'SIEB', 'SING', 'SQ', 'SRAX', 'SSC', 'TSM', 'UBIA', 'UEPS', 'XBLK', 'XNET', 'ZNGA']
-blockchain_master_file = "blockchainmasterList.csv"
-blockchain_directory = 'blockchain'
-print("-> Running Sympathy Sniffer to get you your sympathy play candidates\n")
-get_industry_ticker_data(blockchain_industry,blockchain_directory)
-create_industry_master_list(blockchain_industry,blockchain_master_file,blockchain_directory)
-print("-> Master file created, filename: %s\n" % blockchain_master_file)
-purge_industry_low_gain_volume(blockchain_master_file)
-print('-> And our Lord J Powell said... let there be no rest and lots of BRRRRRRR to your bottom line !')
-print('-> Process completed, enjoy the potential gains !')
-
-#cannabis
-cannabis_industry = ['ABBV', 'ACB', 'ARNA', 'BLOZF', 'CANN', 'CARA', 'CGC', 'CRBP', 'CRON',
-               'CVSI', 'DIGP', 'GRNH', 'GRWC', 'GWPH', 'IIPR', 'KAYS', 'KSHB', 'MCIG',
-               'MJNA', 'MO', 'MSRT', 'POTN', 'SMG', 'TGODF', 'TLRY', 'TRTC', 'TURV', 'YOLO',
-               'ZYNE']
-cannabis_master_file = "cannabismasterList.csv"
-cannabis_directory = 'cannabis'
-print("-> Running Sympathy Sniffer to get you your sympathy play candidates\n")
-get_industry_ticker_data(cannabis_industry,cannabis_directory)
-create_industry_master_list(cannabis_industry,cannabis_master_file,cannabis_directory)
-print("-> Master file created, filename: %s\n" % cannabis_master_file)
-purge_industry_low_gain_volume(cannabis_master_file)
-print('\n\n-> And our Lord J Powell said... let there be no rest and lots of BRRRRRRR to your bottom line !')
-print('-> Process completed, enjoy the potential gains !')
-
 
 
 #ticker source for below - https://www.tradingview.com/markets/stocks-usa/sectorandindustry-sector/
@@ -1873,5 +1898,5 @@ print('\n\n-> And our Lord J Powell said... let there be no rest and lots of BRR
 print('-> Process completed, enjoy the potential gains !')
 
 combine_masters_into_one('industry','master_industry_file.xlsx')
-
-
+combine_one_list('industry','industry_aio_list')
+highlight_dupe_dates('industry','industry_aio_list')
