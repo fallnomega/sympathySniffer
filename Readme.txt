@@ -8,3 +8,18 @@ sympathyPlays:
 Queries all in one final file to see what tickers that also ran with the ticker you specify.
 Specified ticker hard coded in rightnow but will add user input prompt soon. This is still in
 Alpha/Beta and not the most efficient nor elegant but it gets the job done.
+
+Runs off Python and libraries needed are :
+
+pandas
+collections -> Counter
+yfinance
+bs4
+pickle
+requests
+os
+csv
+glob
+pandas 
+operator
+openpyxl
