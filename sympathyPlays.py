@@ -24,7 +24,7 @@ def getPotentialSympathy(ticker):
                 same_list_results.append(row_df[10])
     # print (list_results)
     same_sector_count = Counter(same_list_results)
-    print ("\nSame Sector count:\n {}\n\n".format(same_sector_count))
+    print ("Same Sector count:\n {}\n\n".format(same_sector_count))
 
     for row in list_dates:
         for row_df in target_list:
@@ -42,6 +42,9 @@ def getPotentialSympathy(ticker):
     return 0
 
 #Insert ticker you want potential sympathy plays for.
-ticker = 'NBY'
+ticker = input('Ticker to look up :')
 ticker= ticker.upper()
-getPotentialSympathy(ticker)
+try:
+    getPotentialSympathy(ticker)
+except Exception as ex:
+    print('Error:', ex)
