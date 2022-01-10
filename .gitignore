@@ -1,2 +1,8 @@
 #ignore PyCharm default file or folders for any new project
 .idea
+
+#ignore sector directory
+sector
+
+#ignore DS_STORE
+.DS_Store

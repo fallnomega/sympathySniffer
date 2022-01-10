@@ -21,7 +21,6 @@ def compare_tickers(master_file):
     pd.to_datetime(stock_list['Date'],format='%Y-%m-%d')
     # print(stock_list.sort_values(by='Date'))
     return 0
-
 def get_test_ticker_data(ticker):
     for x in ticker:
         if not os.path.exists('test'):
@@ -52,11 +51,6 @@ def create_test_master_list(tickers,file_out):
     # Convert the above object into a csv file and export
     result_obj.to_csv(file_out, index=False, encoding="utf-8")
     print("\n\n-> Master file called %s  has been generated\n" % file_out)
-
-
-
-
-
 def get_ticker_data(tickers,directory):
     for x in tickers:
         if not os.path.exists('sector'):
@@ -78,7 +72,6 @@ def get_ticker_data(tickers,directory):
                 print('Error:', ex)
         else:
             print('-> Already have {} file so skipping'.format(x))
-
 def create_master_list(tickers,file_out,master_list_directory):
     print('Creating master file: {}'.format(file_out))
     # Produce a single CSV after combining all files
@@ -87,7 +80,6 @@ def create_master_list(tickers,file_out,master_list_directory):
     # Convert the above object into a csv file and export
     result_obj.to_csv('sector/{}'.format(file_out), index=False, encoding="utf-8")
     print("\n\n-> Master file called %s  has been generated\n" % file_out)
-
 def purge_low_gain_volume(master_file):
 
 
@@ -115,7 +107,6 @@ def purge_low_gain_volume(master_file):
     print("-> Removed anything below 10%% percent gain between Open and High from: %s\n" % master_file)
     print("-> Removed anything with volume below 10 million for that day from: %s\n" % master_file)
     return 0
-
 def get_industry_ticker_data(tickers,directory):
     for x in tickers:
         if not os.path.exists('industry'):
@@ -138,7 +129,6 @@ def get_industry_ticker_data(tickers,directory):
                 print('Error:', ex)
         else:
             print('-> Already have {} file so skipping'.format(x))
-
 def create_industry_master_list(tickers,file_out,master_list_directory):
     print('Creating master file: {}'.format(file_out))
     # Produce a single CSV after combining all files
@@ -147,7 +137,6 @@ def create_industry_master_list(tickers,file_out,master_list_directory):
     # Convert the above object into a csv file and export
     result_obj.to_csv('industry/{}'.format(file_out), index=False, encoding="utf-8")
     print("\n\n-> Master file called %s  has been generated\n" % file_out)
-
 def purge_industry_low_gain_volume(master_file):
     print ('Purging low volume and low gain entries')
     lines = list()
@@ -173,7 +162,6 @@ def purge_industry_low_gain_volume(master_file):
     print("-> Removed anything below 10%% percent gain between Open and High from: %s\n" % master_file)
     print("-> Removed anything with volume below 10 million for that day from: %s\n" % master_file)
     return 0
-
 def combine_masters_into_one(directory,name):
     with open('{}/main.csv'.format(directory),"w") as empty_file:
         pass
@@ -206,16 +194,12 @@ def combine_masters_into_one(directory,name):
 
 
     return 0
-
 def combine_one_list(directory,name):
     print ("Creating an All in One file for the sectors")
     all_files = glob.glob(os.path.join(directory, "*.csv"))
     combined_csv = pd.concat([pd.read_csv(f) for f in all_files])
     sortedList = sorted(combined_csv,key=operator.itemgetter(2),reverse=True)
     combined_csv.to_csv("{}.csv".format(name), index=False, encoding='utf-8-sig')
-
-
-
 def highlight_dupe_dates ( area,name):
     print ('Moving potential sympathy plays and the head of the snake rows in {} with same date'.format(area))
     list = pd.read_csv('{}.csv'.format(name))
@@ -228,12 +212,16 @@ def highlight_dupe_dates ( area,name):
     else:
         print("The file does not exist")
 
-
-
 #blockchain
 blockchain_industry =['ACN', 'AMD', 'BITCF', 'BLOC', 'BTCS', 'BTL', 'BTL', 'BTSC', 'CODE', 'DCC', 'DGGXF', 'DPW', 'FTFT', 'GBTC', 'GCAP', 'GROW', 'HIVE', 'IBM', 'INTC', 'INTV', 'JPM', 'LFIN', 'MARA', 'MARK', 'MGTI', 'MSFT', 'NDAQ', 'NETE', 'NVDA', 'OMGT', 'OSTK', 'PFE', 'PRELF', 'QIWI', 'RIOT', 'SAP', 'SIEB', 'SING', 'SQ', 'SRAX', 'SSC', 'TSM', 'UBIA', 'UEPS', 'XBLK', 'XNET', 'ZNGA']
 blockchain_master_file = "blockchainmasterList.csv"
 blockchain_directory = 'blockchain'
+cannabis_industry = ['ABBV', 'ACB', 'ARNA', 'BLOZF', 'CANN', 'CARA', 'CGC', 'CRBP', 'CRON','CVSI', 'DIGP', 'GRNH', 'GRWC', 'GWPH', 'IIPR', 'KAYS', 'KSHB', 'MCIG','0MJNA', 'MO', 'MSRT', 'POTN', 'SMG', 'TGODF', 'TLRY', 'TRTC', 'TURV', 'YOLO','ZYNE']
+cannabis_master_file = "cannabismasterList.csv"
+cannabis_directory = 'cannabis'
+
+
+
 print("-> Running Sympathy Sniffer to get you your sympathy play candidates\n")
 get_ticker_data(blockchain_industry,blockchain_directory)
 create_master_list(blockchain_industry,blockchain_master_file,blockchain_directory)
@@ -245,12 +233,7 @@ print('-> Process completed, moving to the next batch !')
 
 
 #cannabis
-cannabis_industry = ['ABBV', 'ACB', 'ARNA', 'BLOZF', 'CANN', 'CARA', 'CGC', 'CRBP', 'CRON',
-               'CVSI', 'DIGP', 'GRNH', 'GRWC', 'GWPH', 'IIPR', 'KAYS', 'KSHB', 'MCIG',
-               'MJNA', 'MO', 'MSRT', 'POTN', 'SMG', 'TGODF', 'TLRY', 'TRTC', 'TURV', 'YOLO',
-               'ZYNE']
-cannabis_master_file = "cannabismasterList.csv"
-cannabis_directory = 'cannabis'
+
 print("-> Running Sympathy Sniffer to get you your sympathy play candidates\n")
 get_ticker_data(cannabis_industry,cannabis_directory)
 create_master_list(cannabis_industry,cannabis_master_file,cannabis_directory)
