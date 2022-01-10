@@ -7,5 +7,6 @@ sector
 #ignore DS_STORE
 .DS_Store
 
-#ignore industry directory
+#ignore industry file and directory
 industry
+master_industry_file.xlsx
