@@ -8,6 +8,7 @@ import operator
 import openpyxl
 
 import xlrd
+import xlsxwriter
 
 
 def compare_tickers(master_file):

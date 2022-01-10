@@ -6,3 +6,6 @@ sector
 
 #ignore DS_STORE
 .DS_Store
+
+#ignore industry directory
+industry
