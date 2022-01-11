@@ -17,3 +17,7 @@ master_industry_file.xlsx
 oneList
 oneList.csv
 oneList_final_list.xlsx
+
+
+#ignore testing files
+testingGrounds.py
