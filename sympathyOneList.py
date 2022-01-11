@@ -53,20 +53,25 @@ def create_test_master_list(tickers,file_out):
     print("\n\n-> Master file called %s  has been generated\n" % file_out)
 def get_ticker_data(tickers,directory):
     for x in tickers:
-        if not os.path.exists('sector'):
-            os.makedirs('sector')
-        if not os.path.exists('sector/{}'.format(directory)):
-            os.makedirs('sector/{}'.format(directory))
+        if not os.path.exists('oneList'):
+            os.makedirs('oneList')
+        # if not os.path.exists('oneList/{}'.format(directory)):
+        #     os.makedirs('oneList/{}'.format(directory))
 
-        if not os.path.exists('sector/{}/{}.csv'.format(directory,x)):
+        if not os.path.exists('oneList/{}.csv'.format(x)):
             try:
+
                 print('Getting data for: ' + x)
                 df = yf.download(x , period='2y', interval='1d')
+
                 df.dropna(inplace=True)
                 df["Symbol"] = x
                 df["PercentIncrease_High_Open"] = df['High']*100 / df['Open'] -100
+                # print (yf.Ticker('AAPL').info['floatShares'])
+                floatTemp = yf.Ticker('AAPL').info['floatShares']
+                df["Float"] = floatTemp
                 df["Sector"] = '{}'.format(directory)
-                df.to_csv('sector/{}/{}.csv'.format(directory,x))
+                df.to_csv('oneList/{}.csv'.format(x))
 
             except Exception as ex:
                 print('Error:', ex)
@@ -76,7 +81,7 @@ def create_master_list(tickers,file_out,master_list_directory):
     print('Creating master file: {}'.format(file_out))
     # Produce a single CSV after combining all files
 
-    result_obj = pd.concat([pd.read_csv('sector/{}/{}.csv'.format(master_list_directory,ticker)) for ticker in tickers])
+    result_obj = pd.concat([pd.read_csv('{}/{}.csv'.format(master_list_directory,ticker)) for ticker in tickers])
     # Convert the above object into a csv file and export
     result_obj.to_csv('sector/{}'.format(file_out), index=False, encoding="utf-8")
     print("\n\n-> Master file called %s  has been generated\n" % file_out)
@@ -100,61 +105,6 @@ def purge_low_gain_volume(master_file):
     sortedlist = sorted(lines, key=operator.itemgetter(0,6), reverse=True)
 
     with open('sector/{}'.format(master_file),'w') as writeFile:
-        writer = csv.writer(writeFile)
-        writer.writerows(sortedlist)
-    # print ("Getting floats")
-
-    print("-> Removed anything below 10%% percent gain between Open and High from: %s\n" % master_file)
-    print("-> Removed anything with volume below 10 million for that day from: %s\n" % master_file)
-    return 0
-def get_industry_ticker_data(tickers,directory):
-    for x in tickers:
-        if not os.path.exists('industry'):
-            os.makedirs('industry')
-        if not os.path.exists('industry/{}'.format(directory)):
-            os.makedirs('industry/{}'.format(directory))
-
-        if not os.path.exists('industry/{}/{}.csv'.format(directory,x)):
-            try:
-                print('Getting data for: ' + x)
-                df = yf.download(x , period='2y', interval='1d')
-                df.dropna(inplace=True)
-                df["Symbol"] = x
-                df["PercentIncrease_High_Open"] = df['High']*100 / df['Open'] -100
-                df["Industry"] = '{}'.format(directory)
-                df["Float"] = '{}'.format(directory)
-                df.to_csv('industry/{}/{}.csv'.format(directory,x))
-
-            except Exception as ex:
-                print('Error:', ex)
-        else:
-            print('-> Already have {} file so skipping'.format(x))
-def create_industry_master_list(tickers,file_out,master_list_directory):
-    print('Creating master file: {}'.format(file_out))
-    # Produce a single CSV after combining all files
-
-    result_obj = pd.concat([pd.read_csv('industry/{}/{}.csv'.format(master_list_directory,ticker)) for ticker in tickers])
-    # Convert the above object into a csv file and export
-    result_obj.to_csv('industry/{}'.format(file_out), index=False, encoding="utf-8")
-    print("\n\n-> Master file called %s  has been generated\n" % file_out)
-def purge_industry_low_gain_volume(master_file):
-    print ('Purging low volume and low gain entries')
-    lines = list()
-    lines.append(['Date','Open','High','Low','Close','Adj Close','Volume','Symbol','PercentIncrease_High_Open',
-                  'Industry','Float'])
-    with open('industry/{}'.format(master_file),'r') as readFile:
-        reader = csv.reader(readFile)
-        next(reader)
-        for row in reader:
-            if row[8] =='':
-                continue
-            else:
-                if float(row[8]) >= 10.0 and float(row[6]) >= 10000000:
-                    lines.append(row)
-    print("-> Sorting the list by Date and Volume\n")
-    sortedlist = sorted(lines, key=operator.itemgetter(0,6), reverse=True)
-
-    with open('industry/{}_pruned'.format(master_file),'w') as writeFile:
         writer = csv.writer(writeFile)
         writer.writerows(sortedlist)
     # print ("Getting floats")
@@ -195,7 +145,7 @@ def combine_masters_into_one(directory,name):
 
     return 0
 def combine_one_list(directory,name):
-    print ("Creating an All in One file for the sectors")
+    print ("Creating an All in One file")
     all_files = glob.glob(os.path.join(directory, "*.csv"))
     combined_csv = pd.concat([pd.read_csv(f) for f in all_files])
     sortedList = sorted(combined_csv,key=operator.itemgetter(2),reverse=True)
@@ -212,6 +162,8 @@ def highlight_dupe_dates ( area,name):
     else:
         print("The file does not exist")
 
+#for testing with get ticket data function
+#tickers = ['AAPL']
 
 
 tickers= ['A', 'AA', 'AAC', 'AACG', 'AACI', 'AADI', 'AAIC', 'AAL', 'AAMC', 'AAME', 'AAN', 'AAOI', 'AAON', 'AAP', 'AAPL', 'AAQC', 'AAT', 'AATC', 'AAU', 'AAWW', 'AB', 'ABB', 'ABBV', 'ABC', 'ABCB', 'ABCL', 'ABCM', 'ABEO', 'ABEV', 'ABG', 'ABGI', 'ABIO', 'ABM', 'ABMD', 'ABNB', 'ABOS', 'ABR', 'ABSI', 'ABST', 'ABT', 'ABTX', 'ABUS', 'ABVC', 'AC', 'ACA', 'ACAD', 'ACAH', 'ACAQ', 'ACB', 'ACBA', 'ACBI', 'ACC', 'ACCD', 'ACCO', 'ACDI', 'ACEL', 'ACER', 'ACET', 'ACEV', 'ACGL', 'ACH', 'ACHC', 'ACHL', 'ACHR', 'ACHV', 'ACI', 'ACII', 'ACIU', 'ACIW', 'ACKIT', 'ACLS', 'ACM', 'ACMR', 'ACN', 'ACNB', 'ACOR', 'ACQR', 'ACR', 'ACRE', 'ACRO', 'ACRS', 'ACRX', 'ACST', 'ACT', 'ACTD', 'ACTG', 'ACU', 'ACVA', 'ACXP', 'ACY', 'ADAG', 'ADAL', 'ADAP', 'ADBE', 'ADC', 'ADCT', 'ADER', 'ADES', 'ADEX', 'ADGI', 'ADI', 'ADIL', 'ADM', 'ADMA', 'ADMP', 'ADN', 'ADNT', 'ADOC', 'ADP', 'ADPT', 'ADRA', 'ADS', 'ADSE', 'ADSK', 'ADT', 'ADTH', 'ADTN', 'ADTX', 'ADUS', 'ADV', 'ADVM', 'ADXN', 'ADXS', 'AE', 'AEAC', 'AEAE', 'AEE', 'AEG', 'AEHA', 'AEHL', 'AEHR', 'AEI', 'AEIS', 'AEL', 'AEM', 'AEMD', 'AENZ', 'AEO', 'AEP', 'AER', 'AERC', 'AERI', 'AES', 'AESE', 'AEVA', 'AEY', 'AEYE', 'AEZS', 'AFAQ', 'AFBI', 'AFCG', 'AFG', 'AFI', 'AFIB', 'AFIN', 'AFL', 'AFMD', 'AFRM', 'AFTR', 'AFYA',
@@ -235,12 +187,21 @@ tickers= ['A', 'AA', 'AAC', 'AACG', 'AACI', 'AADI', 'AAIC', 'AAL', 'AAMC', 'AAME
   'WINT', 'WINV', 'WIRE', 'WISA', 'WISH', 'WIT', 'WIX', 'WK', 'WKEY', 'WKHS', 'WKME', 'WKSP', 'WLDN', 'WLFC', 'WLK', 'WLKP', 'WLL', 'WLMS', 'WLTW', 'WM', 'WMB', 'WMC', 'WMG', 'WMK', 'WMPN', 'WMS', 'WMT', 'WNC', 'WNEB', 'WNS', 'WNW', 'WOLF', 'WOOF', 'WOR', 'WORX', 'WOW', 'WPC', 'WPCA', 'WPCB', 'WPM', 'WPP', 'WPRT', 'WQGA', 'WRAC', 'WRAP', 'WRB', 'WRBY', 'WRE', 'WRK', 'WRLD', 'WRN', 'WSBC', 'WSBF', 'WSC', 'WSFS', 'WSM', 'WSO', 'WSR', 'WST', 'WSTG', 'WTBA', 'WTER', 'WTFC', 'WTI', 'WTM', 'WTRG', 'WTRH', 'WTS', 'WTT', 'WTTR', 'WU', 'WULF', 'WVE', 'WVFC', 'WVVI', 'WW', 'WWAC', 'WWD', 'WWE', 'WWR', 'WWW', 'WY', 'WYNN', 'WYY', 'X', 'XAIR', 'XBIO', 'XBIT', 'XCUR', 'XEL', 'XELA', 'XELB', 'XENE', 'XENT', 'XERS', 'XFIN', 'XFOR', 'XGN', 'XHR', 'XIN', 'XL', 'XLNX', 'XLO', 'XM', 'XMTR', 'XNCR', 'XNET', 'XOM', 'XOMA', 'XOS', 'XP', 'XPAX', 'XPDI', 'XPEL', 'XPER', 'XPEV', 'XPL', 'XPO', 'XPOA', 'XPOF', 'XPRO', 'XRAY', 'XRTX', 'XRX', 'XSPA', 'XTLB', 'XTNT', 'XXII', 'XYF', 'XYL', 'Y', 'YALA', 'YCBD', 'YELL', 'YELP', 'YETI', 'YEXT', 'YGMZ', 'YI', 'YJ', 'YMAB', 'YMM', 'YMTX', 'YNDX', 'YORW', 'YOU', 'YPF', 'YQ', 'YRD', 'YSAC', 'YSG', 'YTEN', 'YTPG', 'YTRA', 'YUM', 'YUMC', 'YVR', 'YY', 'Z', 'ZBH', 'ZBRA', 'ZCMD', 'ZD', 'ZDGE', 'ZEAL', 'ZEN', 'ZENV', 'ZEPP', 'ZEST', 'ZETA', 'ZEUS', 'ZEV', 'ZG', 'ZGN', 'ZGNX', 'ZH', 'ZI', 'ZIM', 'ZION', 'ZIOP', 'ZIP', 'ZIVO', 'ZKIN', 'ZLAB', 'ZM', 'ZME', 'ZNGA', 'ZNH', 'ZNTE', 'ZNTL', 'ZOM', 'ZS', 'ZSAN', 'ZT', 'ZTO', 'ZTS', 'ZUMZ', 'ZUO', 'ZVIA', 'ZVO', 'ZWRK', 'ZWS', 'ZY', 'ZYME', 'ZYNE', 'ZYXI']
 
 
-
-
+oneList = "oneList"
+oneList_directory = "oneList"
+oneList_master_file = "master_one_list.csv"
 print("-> Running Sympathy Sniffer to get you your sympathy play candidates\n")
 get_ticker_data(tickers,oneList)
 create_master_list(tickers,oneList_master_file,oneList_directory)
-print("-> Master file created, filename: %s\n" % blockchain_master_file)
-purge_low_gain_volume(blockchain_master_file)
+print("-> Master file created, filename: %s\n" % oneList_master_file)
+purge_low_gain_volume(oneList_master_file)
 print('-> And our Lord J Powell said... let there be no rest and lots of BRRRRRRR to your bottom line !')
 print('-> Process completed, moving to the next batch !')
+
+
+# combine_masters_into_one('oneList','master_oneList_file.xlsx')
+combine_one_list('oneList','oneList')
+highlight_dupe_dates('oneList','oneList')
+
+print('\n\n-> And our Lord J Powell said... let there be no rest and lots of BRRRRRRR to your bottom line !')
+print('-> Process completed, enjoy the potential gains !')

@@ -1,8 +1,9 @@
 #ignore PyCharm default file or folders for any new project
 .idea
 
-#ignore sector directory
+#ignore sector directory and master sector file
 sector
+master_sector_file.xlsx
 
 #ignore DS_STORE
 .DS_Store
@@ -10,3 +11,9 @@ sector
 #ignore industry file and directory
 industry
 master_industry_file.xlsx
+
+
+#ignore oneList things
+oneList
+oneList.csv
+oneList_final_list.xlsx
