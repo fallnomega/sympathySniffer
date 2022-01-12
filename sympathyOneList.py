@@ -99,7 +99,7 @@ def purge_low_gain_volume(master_file):
             if row[8] =='':
                 continue
             else:
-                if float(row[8]) >= 10.0 and float(row[6]) >= 3000000:
+                if float(row[8]) >= 5.0 and float(row[6]) >= 3000000:
                     lines.append(row)
     print("-> Sorting the list by Date and Volume\n")
     sortedlist = sorted(lines, key=operator.itemgetter(0,6), reverse=True)
