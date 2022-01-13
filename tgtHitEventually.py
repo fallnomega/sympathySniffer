@@ -13,7 +13,7 @@ def get_ticker_data(tickers,directory):
     for x in tickers:
         if not os.path.exists(directory):
             os.makedirs(directory)
-        if not os.path.exists('{}}/{}.csv'.format(directory,x)):
+        if not os.path.exists('{}/{}.csv'.format(directory,x)):
             try:
 
                 print('Getting data for: ' + x)
@@ -22,7 +22,7 @@ def get_ticker_data(tickers,directory):
                 df["Symbol"] = x
                 df["PercentIncrease_High_Open"] = df['High']*100 / df['Open'] -100
                 df["Sector"] = '{}'.format(directory)
-                df.to_csv('{}}/{}.csv'.format(directory,x))
+                df.to_csv('{}/{}.csv'.format(directory,x))
 
             except Exception as ex:
                 print('Error:', ex)
@@ -34,3 +34,5 @@ def get_ticker_data(tickers,directory):
 #long - determine if it ever hit the PT
 #short - determine if it ever hit the PT
 
+tickers = ['AAPL','TSLA']
+get_ticker_data(tickers,'targetHitEventually')

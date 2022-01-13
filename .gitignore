@@ -9,16 +9,17 @@ master_sector_file.xlsx
 .DS_Store
 
 #ignore industry file and directory
-industry
 master_industry_file.xlsx
 
-
 #ignore oneList things
-oneList
 oneList.csv
 oneList_final_list.xlsx
 
-
 #ignore testing files
 testingGrounds.py
+
+#ignore directories
+targetHitEventually
 testingDir
+oneList
+industry
