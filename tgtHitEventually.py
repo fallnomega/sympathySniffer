@@ -38,8 +38,8 @@ def get_ticker_data(tickers,directory):
 #determine if short or long
 #long - determine if it ever hit the PT
 def longTargethit(tickers,directory):
+    hits = 0
     for ticker,pt in tickers.items():
-        hits = 0
         print ('Opening {}.csv'.format(ticker))
         print('Parsing data to see if {} ever hit ${}'.format(ticker,pt))
         data = pd.read_csv('{}/{}.csv'.format(directory,ticker))
@@ -48,8 +48,10 @@ def longTargethit(tickers,directory):
         for ind in data.index:
             if data['High'][ind] >= pt:
                 print ('{} PT {} hit: \nDate - {}    High - {}'.format(data['Symbol'][ind],pt,data['Date'][ind],data['High'][ind]))
-                hits = hits +1
+                hits = hits+1
                 break
+            continue
+
         print ('hits total = {} \n out of a total of {} ideas.\n\n'.format(hits,len(tickers)))
 
     return 0
