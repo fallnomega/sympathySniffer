@@ -173,7 +173,10 @@ long_target_hit(ticker_df, directory)
 short_target_hit(ticker_df, directory)
 
 # To do -
-# add way to manually add tickers,pt,date so it isnt hard coded in.
-# implement the short scan
-# define how one specifies the ticker to look up plus price target.
+# * add way to manually add tickers,pt,date so it isnt hard coded in.
+# * implement the short scan
+# * idea - for hits take entry date, stop loss, pt, and see if there is a
+#          pattern to when PT was hit. did it double dip into entry and stop
+#          before hitting PT ?
+# * define how one specifies the ticker to look up plus price target.
 exit()
