@@ -44,39 +44,11 @@ def longTargethit(tickers,directory):
         data = pd.read_csv('{}/{}.csv'.format(directory,ticker))
         # print data
         # print data.Close
-        print pt
-        for x in data.Date:
-            print x
-        # target_list = df.values.tolist()
-        # sector = target['Sector'].values[0]
-        # # print (sector)
-        # list_dates = target.values.tolist()
-        # same_list_results = list()
-        # diff_sector_list = list()
-        #
-        # for row in list_dates:
-        #     # print (row[3])
-        #     for row_df in target_list:
-        #         if row[3] == row_df[3] and sector == row_df[9]:
-        #             # print ('SAME SECTOR - Date: {} | Symbol: ${} | Volume: {} | Open vs HOD percent difference: {} %'.format(row_df[3],row_df[10],row_df[11], round(row_df[8], 2)))
-        #             same_list_results.append(row_df[10])
-        # # print (list_results)
-        # same_sector_count = Counter(same_list_results)
-        # print ("Same Sector count:\n {}\n\n".format(same_sector_count))
-        #
-        # for row in list_dates:
-        #     for row_df in target_list:
-        #         if row[3] == row_df[3]:
-        #             # print ('CROSS SECTOR - Date: {} | Symbol: ${} | Volume: {} | Open vs HOD percent difference: {} % | Sector: {}'.format(row_df_dif_sector[3],row_df_dif_sector[10],row_df_dif_sector[11], round(row_df_dif_sector[8], 2),row_df_dif_sector[9]))
-        #             diff_sector_list.append(row_df[10])
-        # diff_sector_count = Counter(diff_sector_list)
-        #
-        # print("Check cross sector potential sympathy plays :\n {}".format(diff_sector_count))
-        #
-        #
-        #
-        #
-        #
+        for ind in data.index:
+            if data['High'][ind] >= pt:
+                print ('{} PT hit: \nDate - {}    High - {}'.format(data['Symbol'][ind],data['Date'][ind],data['High'][ind]))
+        print ('\n\n')
+
     return 0
 
 #short - determine if it ever hit the PT
@@ -118,7 +90,7 @@ def longTargethit(tickers,directory):
 
 
 
-ticker_pt = {'AAPL':100,'TSLA':700}
+ticker_pt = {'AAPL':180,'TSLA':1210}
 directory = 'targetHitEventually'
 
 get_ticker_data(ticker_pt,directory)
