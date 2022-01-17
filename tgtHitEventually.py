@@ -102,12 +102,6 @@ def short_target_hit(short_tickers, directory_s):
     return 0
 
 
-# TESTING VARs AND WHAT NOT
-# ticker_info = {'Symbol': ['AAL', 'VISL', 'SHWZ', 'AMD'],
-#       'Target': [20, 1000, 1000, 91.97],
-#        'Date': [datetime.datetime(2021,01,15), datetime.datetime(2021,01,15),
-#                 datetime.datetime(2021,01,19), datetime.datetime(2021,02,04)]}
-
 directory = 'targetHitEventually'
 
 # LONGS
@@ -266,9 +260,6 @@ short_ticker_info = {'Symbol': ['NVDA', 'TWTR', 'AAPL', 'PTON', 'PTON', 'SPY', '
 # Pandas engaged
 ticker_df_long = pd.DataFrame(long_ticker_info, columns=['Symbol', 'Target', 'Date'])
 ticker_df_short = pd.DataFrame(short_ticker_info, columns=['Symbol', 'Target', 'Date'])
-# print('Symbol = {}\nTarget = {}\nDate = {}'.format(len(short_ticker_info['Symbol']),
-#                                                    len(short_ticker_info['Target']),
-#                                                    len(short_ticker_info['Date'])))
 
 # get ticker info from yfinance
 get_ticker_data(ticker_df_long, directory)
