@@ -279,7 +279,7 @@ long_target_hit(ticker_df_long, directory)
 short_target_hit(ticker_df_short, directory)
 
 # To do -
-# * add way to manually add tickers,pt,date so it isnt hard coded in.
+# * add way to manually add tickers,pt,date so it isnt hard coded in. maybe sqllite
 # * idea - for hits take entry date, stop loss, pt, and see if there is a
 #          pattern to when PT was hit. did it double dip into entry and stop
 #          before hitting PT ?
