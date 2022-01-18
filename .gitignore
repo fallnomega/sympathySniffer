@@ -16,7 +16,7 @@ oneList.csv
 oneList_final_list.xlsx
 
 #ignore testing files
-testingGrounds.py
+testingDir/testingGrounds.py
 ticker_data.csv
 
 #ignore directories
@@ -24,3 +24,4 @@ targetHitEventually
 testingDir
 oneList
 industry
+tickers_directory

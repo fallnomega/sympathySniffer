@@ -2,6 +2,7 @@
 import os
 import yfinance as yf
 import pandas as pd
+import get_stk_data
 
 pd.options.mode.chained_assignment = None  # default='warn'
 
@@ -26,24 +27,6 @@ def open_csv():
 
     data = pd.read_csv('trades.csv')
     return data
-
-
-def get_ticker_data(tickers, directoryz):
-    for ind in tickers.index:
-        if not os.path.exists(directoryz):
-            os.makedirs(directoryz)
-        if not os.path.exists('{}/{}.csv'.format(directoryz, tickers['Stock Symbol'][ind])):
-            try:
-                df = yf.download(tickers['Stock Symbol'][ind], period='2y', interval='1d')
-                df.dropna(inplace=True)
-                df["Symbol"] = tickers['Stock Symbol'][ind]
-                df.to_csv('{}/{}.csv'.format(directoryz, tickers['Stock Symbol'][ind]))
-
-            except Exception as ex:
-                print('Error:', ex)
-        else:
-            print('-> Already have {}.csv file, skipping'.format(tickers['Stock Symbol'][ind]))
-
 
 # determine if a long trade or short, then call the right function
 def sort_and_process(directoryz):
@@ -127,11 +110,11 @@ def short_target_hit(tickers, directoryz):
     return hits
 
 
-directory = 'testingDir'
+directory = 'tickers_directory'
 trades = open_csv()
 
 # get ticker info from yfinance
-get_ticker_data(trades, directory)
+get_stk_data.get_ticker_data(trades, directory)
 
 # determine if long or short, send to right process call
 sort_and_process(directory)
