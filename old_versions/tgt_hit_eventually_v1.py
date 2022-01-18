@@ -9,7 +9,7 @@ pd.options.mode.chained_assignment = None  # default='warn'
 
 # open file if you prefer
 def open_csv():
-    if not os.path.exists('trades.csv'):
+    if not os.path.exists('../trades.csv'):
         print ('''
             Missing file:trades.csv. Create it and save to same directory as the script your running for it.
             Columns to use, and in this order, are :
@@ -21,7 +21,7 @@ def open_csv():
             ''')
         return 0
 
-    data = pd.read_csv('trades.csv')
+    data = pd.read_csv('../trades.csv')
     return data
 
 
@@ -36,9 +36,6 @@ def get_ticker_data(tickers, directoryz):
             os.makedirs(directoryz)
         if not os.path.exists('{}/{}.csv'.format(directoryz, tickers['Symbol'][ind])):
             try:
-
-                # print('Getting data for: {}'.format(tickers['Symbol'][ind]))
-                # print price_target
                 df = yf.download(tickers['Symbol'][ind], period='2y', interval='1d')
                 df.dropna(inplace=True)
                 df["Symbol"] = tickers['Symbol'][ind]
