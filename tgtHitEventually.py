@@ -7,6 +7,24 @@ import pandas as pd
 pd.options.mode.chained_assignment = None  # default='warn'
 
 
+# open file if you prefer
+def open_csv():
+    if not os.path.exists('trades.csv'):
+        print ('''
+            Missing file:trades.csv. Create it and save to same directory as the script your running for it.
+            Columns to use, and in this order, are :
+            Entry Date	
+            Stock Symbol	
+            Long/Short	
+            Entry Price	
+            Stop Loss
+            ''')
+        return 0
+
+    data = pd.read_csv('trades.csv')
+    return data
+
+
 # pull date, current price, dates high, and dates low info from data
 # data result example calling for AAPL:
 # |Date|Adj Close|Close|High||Low|Open|Volume|Symbol
@@ -270,7 +288,8 @@ long_target_hit(ticker_df_long, directory)
 short_target_hit(ticker_df_short, directory)
 
 # To do -
-# * add way to manually add tickers,pt,date so it isnt hard coded in. maybe sqllite
+# * add way to manually add tickers,pt,date so it isnt hard coded in.
+# * store things in sqllite
 # * idea - for hits take entry date, stop loss, pt, and see if there is a
 #          pattern to when PT was hit. did it double dip into entry and stop
 #          before hitting PT ?
